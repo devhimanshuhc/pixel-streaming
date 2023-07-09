@@ -24,36 +24,39 @@ db.connect((err) => {
 app.use("/", require("./routes/pages"));
 app.use("/api", require("./controllers/auth"));
 
-app.post("/upload", upload.single("file"), (req, res) => {
-  console.log(req.body);
-  res.send("Uploaded at", req.file.location + "location");
+app.get("/upload", async (req, res) => {
+  const filename = req.query.filename;
+  const contentType = req.query.contentType;
+  const url = putObject(filename, contentType);
+  console.log(res.send({ url }));
+  console.log(url);
 });
 
-app.get("/list", async (req, res) => {
-  let r = await S3.listObjectV2({ Bucket: "pixelstreamings3" }).promise;
-  let x = r.Contents.map((e) => e.Key);
-  res.send(x);
-});
+// app.get("/list", async (req, res) => {
+//   let r = await S3.listObjectV2({ Bucket: "pixelstreamings3" }).promise;
+//   let x = r.Contents.map((e) => e.Key);
+//   res.send(x);
+// });
 
-app.get("/download/:filename", async (req, res) => {
-  const fileName = req.params.filename;
-  await S3.getObject({
-    Bucket: "pixelstreamings3",
-    Key: fileName,
-  }).promise();
+// app.get("/download/:filename", async (req, res) => {
+//   const fileName = req.params.filename;
+//   await S3.getObject({
+//     Bucket: "pixelstreamings3",
+//     Key: fileName,
+//   }).promise();
 
-  res.send(x.body);
-});
+//   res.send(x.body);
+// });
 
-app.delete("/delete/:filename", async (req, res) => {
-  const fileName = req.params.filename;
-  await S3.deleteObject({
-    Bucket: "pixelstreamings3",
-    Key: fileName,
-  }).promise();
+// app.delete("/delete/:filename", async (req, res) => {
+//   const fileName = req.params.filename;
+//   await S3.deleteObject({
+//     Bucket: "pixelstreamings3",
+//     Key: fileName,
+//   }).promise();
 
-  res.send("Deleted");
-});
+//   res.send("Deleted");
+// });
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
